@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuthStore } from '@/stores/auth.store';
 import { AccountSection }       from '@/features/settings/components/AccountSection';
 import { AppearanceSection }    from '@/features/settings/components/AppearanceSection';
 import { DeviceSection }        from '@/features/settings/components/DeviceSection';
@@ -8,7 +8,7 @@ import { AdminSection }         from '@/features/settings/components/AdminSectio
 import { DangerZone }           from '@/features/settings/components/DangerZone';
 
 export function SettingsPage() {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
 
   return (
     <div className="min-h-screen bg-[#080808] text-white">

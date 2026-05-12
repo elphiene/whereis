@@ -8,6 +8,7 @@ import { BottomSheet } from '@/features/friends/components/BottomSheet';
 import { AvatarStrip } from '@/features/friends/components/AvatarStrip';
 import { useFriendsStore } from '@/features/friends/store';
 import { useTraccarSocket } from '@/shared/hooks/useTraccarSocket';
+import { api } from '@/shared/lib/traccar';
 
 function SetupBanner() {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ function SetupBanner() {
     if (!visible || !deviceId) return;
     const interval = setInterval(async () => {
       try {
-        const res = await fetch('/api/positions', { credentials: 'include' });
+        const res = await api('/api/positions');
         if (!res.ok) return;
         const positions: { deviceId: number; fixTime: string }[] = await res.json();
         const now = Date.now();
@@ -80,10 +81,7 @@ export function MapPage() {
   async function handlePauseToggle(userId: number, pause: boolean) {
     useFriendsStore.getState().setMemberDisabled(userId, pause); // optimistic
     try {
-      const res = await fetch(`/backend/${pause ? 'pause' : 'resume'}`, {
-        method: 'POST',
-        credentials: 'include',
-      });
+      const res = await api(`/backend/${pause ? 'pause' : 'resume'}`, { method: 'POST' });
       if (!res.ok) useFriendsStore.getState().setMemberDisabled(userId, !pause);
     } catch {
       useFriendsStore.getState().setMemberDisabled(userId, !pause);

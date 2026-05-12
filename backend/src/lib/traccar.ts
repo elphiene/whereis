@@ -16,3 +16,5 @@ export async function traccarAdmin(path: string, options: RequestInit = {}): Pro
 }
 
 export { TRACCAR_URL };
+
+export const NTFY_BASE_URL = process.env.NTFY_BASE_URL ?? 'https://ntfy.sh';

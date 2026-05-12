@@ -1,8 +1,7 @@
 import { requireAuth } from '../middleware/auth.ts';
 import { db } from '../db/schema.ts';
 import { json } from '../lib/router.ts';
-
-const NTFY_BASE_URL = process.env.NTFY_BASE_URL ?? 'https://ntfy.sh';
+import { NTFY_BASE_URL } from '../lib/traccar.ts';
 
 interface PrefRow {
   event_type: string;

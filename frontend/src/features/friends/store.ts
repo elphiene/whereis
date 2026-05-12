@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { api } from '@/shared/lib/traccar';
 
 export interface Member {
   userId: number;
@@ -45,6 +46,7 @@ interface FriendsState {
 interface BackendMember {
   userId: number;
   traccarUserId: number;
+  traccarDeviceId: number | null;
   role: 'admin' | 'member';
   name: string;
   colour: string | null;
@@ -58,7 +60,7 @@ interface TraccarDevice {
   lastUpdate: string;
 }
 
-export const useFriendsStore = create<FriendsState>((set, get) => ({
+export const useFriendsStore = create<FriendsState>((set) => ({
   members: [],
   loading: false,
 
@@ -66,8 +68,8 @@ export const useFriendsStore = create<FriendsState>((set, get) => ({
     set({ loading: true });
     try {
       const [membersRes, devicesRes] = await Promise.all([
-        fetch('/backend/members', { credentials: 'include' }),
-        fetch('/api/devices', { credentials: 'include' }),
+        api('/backend/members'),
+        api('/api/devices'),
       ]);
       if (!membersRes.ok || !devicesRes.ok) return;
 
@@ -76,10 +78,10 @@ export const useFriendsStore = create<FriendsState>((set, get) => ({
       const deviceMap = new Map(traccarDevices.map((d) => [d.id, d]));
 
       const members: Member[] = backendMembers.map((bm) => {
-        const device = deviceMap.get(bm.userId) ?? null;
+        const device = deviceMap.get(bm.traccarDeviceId ?? bm.userId) ?? null;
         return {
           userId: bm.userId,
-          traccarDeviceId: bm.userId, // userId = traccarDeviceId mapping via backend
+          traccarDeviceId: bm.traccarDeviceId ?? bm.userId,
           name: bm.name,
           colour: bm.colour ?? '#ec4899',
           role: bm.role,

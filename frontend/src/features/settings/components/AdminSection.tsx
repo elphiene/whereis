@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuthStore } from '@/stores/auth.store';
+import { api } from '@/shared/lib/traccar';
 import { getMemberStatus } from '@/features/friends/store';
 
 function relativeTime(dateStr: string): string {
@@ -26,7 +27,7 @@ interface InviteResult {
 }
 
 export function AdminSection() {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const [expiryHours,    setExpiryHours]    = useState<24 | 168>(168);
   const [invite,         setInvite]         = useState<InviteResult | null>(null);
   const [generating,     setGenerating]     = useState(false);
@@ -39,7 +40,7 @@ export function AdminSection() {
 
   useEffect(() => {
     setLoadingMembers(true);
-    fetch('/backend/members', { credentials: 'include' })
+    api('/backend/members')
       .then((r) => r.json())
       .then((data: MemberRow[]) => setMembers(data))
       .catch(() => {})
@@ -49,9 +50,8 @@ export function AdminSection() {
   async function generateInvite() {
     setGenerating(true); setError(null);
     try {
-      const res = await fetch('/backend/invites', {
-        method: 'POST', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await api('/backend/invites', {
+        method: 'POST',
         body: JSON.stringify({ expiryHours }),
       });
       if (!res.ok) { setError('Failed to generate invite.'); return; }
@@ -63,7 +63,7 @@ export function AdminSection() {
   async function removeMember(userId: number) {
     setRemoving(true);
     try {
-      const res = await fetch(`/backend/members/${userId}`, { method: 'DELETE', credentials: 'include' });
+      const res = await api(`/backend/members/${userId}`, { method: 'DELETE' });
       if (res.ok) setMembers((m) => m.filter((row) => row.userId !== userId));
       else setError('Remove failed.');
     } catch { setError('Network error.'); }

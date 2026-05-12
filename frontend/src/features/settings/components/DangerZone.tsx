@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
+import { api } from '@/shared/lib/traccar';
 
 export function DangerZone() {
   const navigate  = useNavigate();
@@ -12,10 +13,9 @@ export function DangerZone() {
   async function handleLeave() {
     setLeaving(true); setError(null);
     try {
-      const res = await fetch('/backend/leave', { method: 'POST', credentials: 'include' });
+      const res = await api('/backend/leave', { method: 'POST' });
       if (!res.ok) { setError('Failed to leave group. Please try again.'); setLeaving(false); return; }
-      // Delete session cookie
-      await fetch('/api/session', { method: 'DELETE', credentials: 'include' }).catch(() => {});
+      await api('/api/session', { method: 'DELETE' }).catch(() => {});
       clear();
       navigate('/left', { replace: true });
     } catch {

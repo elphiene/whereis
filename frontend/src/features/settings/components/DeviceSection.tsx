@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuthStore } from '@/stores/auth.store';
 import { useFriendsStore, getMemberStatus } from '@/features/friends/store';
 import { useMapStore } from '@/features/map/store';
 import { SERVER_URL } from '@/shared/lib/traccar';
@@ -171,7 +171,7 @@ function ReconnectFlow({ uuid, deviceId, colour, name, onDone }: {
 }
 
 export function DeviceSection() {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const members = useFriendsStore((s) => s.members);
   const positions = useMapStore((s) => s.positions);
   const { state: onbState } = useOnboardingState();

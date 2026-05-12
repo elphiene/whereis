@@ -1,6 +1,5 @@
 import { db } from '../db/schema.ts';
-
-const NTFY_BASE_URL = process.env.NTFY_BASE_URL ?? 'https://ntfy.sh';
+import { NTFY_BASE_URL } from '../lib/traccar.ts';
 
 interface TraccarWebhookPayload {
   event?: {

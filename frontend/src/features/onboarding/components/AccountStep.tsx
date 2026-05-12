@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { WizardShell, WizardButtons } from './WizardShell';
 import { useAuthStore } from '@/stores/auth.store';
+import { api } from '@/shared/lib/traccar';
 import type { OnboardingState } from '../hooks/useOnboardingState';
 
 interface AccountStepProps {
@@ -29,9 +30,8 @@ export function AccountStep({ state, onUpdate, onNext }: AccountStepProps) {
 
     try {
       // 1. Create Traccar user account
-      const userRes = await fetch('/api/users', {
+      const userRes = await api('/api/users', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, administrator: false, disabled: false }),
       });
 
@@ -54,10 +54,8 @@ export function AccountStep({ state, onUpdate, onNext }: AccountStepProps) {
       const traccarUser = await userRes.json();
 
       // 2. Log in with new credentials
-      const sessionRes = await fetch('/api/session', {
+      const sessionRes = await api('/api/session', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
       if (!sessionRes.ok) {
@@ -68,10 +66,8 @@ export function AccountStep({ state, onUpdate, onNext }: AccountStepProps) {
 
       // 3. Generate device UUID and register with Traccar
       const uuid = crypto.randomUUID();
-      const deviceRes = await fetch('/api/devices', {
+      const deviceRes = await api('/api/devices', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: `${name}'s Device`, uniqueId: uuid }),
       });
       if (!deviceRes.ok) {
@@ -83,10 +79,8 @@ export function AccountStep({ state, onUpdate, onNext }: AccountStepProps) {
 
       // 4. Register with backend (stores in SQLite, shares permissions, marks token used)
       const inviteToken = sessionStorage.getItem('invite_token');
-      const regRes = await fetch('/backend/register', {
+      const regRes = await api('/backend/register', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ inviteToken, uuid, traccarDeviceId: traccarDevice.id }),
       });
       if (!regRes.ok) {

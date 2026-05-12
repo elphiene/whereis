@@ -1,10 +1,10 @@
 import { cn } from '@/shared/lib/utils';
 import { mapInstance } from '../hooks/useMapInstance';
 import { useMapStore } from '../store';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuthStore } from '@/stores/auth.store';
 
 export function FABs({ className }: { className?: string }) {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const positions = useMapStore((s) => s.positions);
 
   function flyToSelf() {

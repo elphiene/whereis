@@ -1,6 +1,6 @@
 import { type Member, getMemberStatus } from '../store';
 import { useMapStore } from '@/features/map/store';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuthStore } from '@/stores/auth.store';
 import { mapInstance } from '@/features/map/hooks/useMapInstance';
 import { cn } from '@/shared/lib/utils';
 
@@ -18,7 +18,7 @@ interface FriendCardProps {
 }
 
 export function FriendCard({ member, onPauseToggle }: FriendCardProps) {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const { selectedFriendId, setSelectedFriendId, positions } = useMapStore();
   const pos = positions[member.userId];
 

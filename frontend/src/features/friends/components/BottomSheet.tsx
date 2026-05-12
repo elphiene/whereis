@@ -3,7 +3,7 @@ import { Drawer } from 'vaul';
 import { useFriendsStore, sortMembers, getMemberStatus } from '../store';
 import { useMapStore } from '@/features/map/store';
 import { FriendCard } from './FriendCard';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuthStore } from '@/stores/auth.store';
 
 function relativeTime(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -18,7 +18,7 @@ interface BottomSheetProps {
 }
 
 export function BottomSheet({ onPauseToggle }: BottomSheetProps) {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const [snap, setSnap] = useState<number | string | null>(0.12);
 
   const members = useFriendsStore((s) => sortMembers(s.members));

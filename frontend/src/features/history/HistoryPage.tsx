@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import maplibregl from 'maplibre-gl';
 import { DatePresetChips, getDateRange, type DatePreset } from '@/shared/components/DatePresetChips';
 import { useFriendsStore } from '@/features/friends/store';
+import { api } from '@/shared/lib/traccar';
 
 const LIBERTY = 'https://tiles.openfreemap.org/styles/liberty';
 
@@ -63,7 +64,7 @@ export function HistoryPage() {
     if (!member) return;
     const { from, to } = getDateRange(preset);
     setLoading(true); setTrips([]); setActiveTrip(null);
-    fetch(`/api/reports/trips?deviceId=${member.traccarDeviceId}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, { credentials: 'include' })
+    api(`/api/reports/trips?deviceId=${member.traccarDeviceId}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`)
       .then((r) => r.ok ? r.json() : [])
       .then(setTrips)
       .catch(() => {})
@@ -82,7 +83,7 @@ export function HistoryPage() {
 
     const from = new Date(trip.startTime).toISOString();
     const to   = new Date(trip.endTime).toISOString();
-    const res  = await fetch(`/api/reports/route?deviceId=${member.traccarDeviceId}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, { credentials: 'include' });
+    const res  = await api(`/api/reports/route?deviceId=${member.traccarDeviceId}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
     if (!res.ok) return;
     const positions: Position[] = await res.json();
     const coords = positions.map((p) => [p.longitude, p.latitude] as [number, number]);

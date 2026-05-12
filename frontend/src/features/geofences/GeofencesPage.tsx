@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import maplibregl from 'maplibre-gl';
+import { api } from '@/shared/lib/traccar';
 
 const LIBERTY = 'https://tiles.openfreemap.org/styles/liberty';
 
@@ -96,7 +97,7 @@ export function GeofencesPage() {
   // Load + render geofences on map ready
   useEffect(() => {
     if (!mapReady) return;
-    fetch('/api/geofences', { credentials: 'include' })
+    api('/api/geofences')
       .then((r) => r.ok ? r.json() : [])
       .then((data: Geofence[]) => {
         setGeofences(data);
@@ -148,9 +149,8 @@ export function GeofencesPage() {
     setSaving(true); setError(null);
     const area = `CIRCLE (${draw.lat} ${draw.lng}, ${draw.radius})`;
     try {
-      const res = await fetch('/api/geofences', {
-        method: 'POST', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await api('/api/geofences', {
+        method: 'POST',
         body: JSON.stringify({ name: draw.name, area }),
       });
       if (!res.ok) { setError('Save failed.'); return; }
@@ -159,9 +159,8 @@ export function GeofencesPage() {
       const alertTypes = draw.alertType === 'both' ? ['geofenceEnter', 'geofenceExit']
         : draw.alertType === 'enter' ? ['geofenceEnter'] : ['geofenceExit'];
       await Promise.all(alertTypes.map((type) =>
-        fetch('/api/notifications', {
-          method: 'POST', credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
+        api('/api/notifications', {
+          method: 'POST',
           body: JSON.stringify({ type, geofenceId: gf.id }),
         }),
       ));
@@ -179,9 +178,8 @@ export function GeofencesPage() {
   }
 
   async function updateName(id: number) {
-    const res = await fetch(`/api/geofences/${id}`, {
-      method: 'PUT', credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await api(`/api/geofences/${id}`, {
+      method: 'PUT',
       body: JSON.stringify({ id, name: editName }),
     });
     if (res.ok) setGeofences((prev) => prev.map((g) => g.id === id ? { ...g, name: editName } : g));
@@ -189,7 +187,7 @@ export function GeofencesPage() {
   }
 
   async function deleteGeofence(id: number) {
-    const res = await fetch(`/api/geofences/${id}`, { method: 'DELETE', credentials: 'include' });
+    const res = await api(`/api/geofences/${id}`, { method: 'DELETE' });
     if (res.ok) {
       setGeofences((prev) => prev.filter((g) => g.id !== id));
       mapInst.current && removeGeofenceLayer(mapInst.current, id);

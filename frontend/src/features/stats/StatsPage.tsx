@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts';
 import { DatePresetChips, getDateRange, type DatePreset } from '@/shared/components/DatePresetChips';
 import { useFriendsStore } from '@/features/friends/store';
+import { Spinner } from '@/shared/components/Spinner';
+import { api } from '@/shared/lib/traccar';
 
 interface Summary {
   deviceId: number;
@@ -67,9 +69,9 @@ export function StatsPage() {
     Promise.all(
       members.map(async (m) => {
         const [summaryRes, tripsRes, eventsRes] = await Promise.all([
-          fetch(`/api/reports/summary?deviceId=${m.traccarDeviceId}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, { credentials: 'include' }),
-          fetch(`/api/reports/trips?deviceId=${m.traccarDeviceId}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, { credentials: 'include' }),
-          fetch(`/api/reports/events?deviceId=${m.traccarDeviceId}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, { credentials: 'include' }),
+          api(`/api/reports/summary?deviceId=${m.traccarDeviceId}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`),
+          api(`/api/reports/trips?deviceId=${m.traccarDeviceId}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`),
+          api(`/api/reports/events?deviceId=${m.traccarDeviceId}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`),
         ]);
 
         const summaries: Summary[] = summaryRes.ok ? await summaryRes.json() : [];
@@ -127,9 +129,7 @@ export function StatsPage() {
       </div>
 
       {loading && (
-        <div className="flex items-center justify-center py-20">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#ec4899] border-t-transparent" />
-        </div>
+        <Spinner />
       )}
 
       {!loading && (

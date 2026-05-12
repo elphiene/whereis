@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuthStore } from '@/stores/auth.store';
+import { api } from '@/shared/lib/traccar';
 
 function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -25,7 +26,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement> & { extraRight
 }
 
 export function AccountSection() {
-  const { user, hydrate } = useAuth();
+  const { user, hydrate } = useAuthStore();
 
   const [name,        setName]        = useState(user?.name ?? '');
   const [email,       setEmail]       = useState(user?.email ?? '');
@@ -56,10 +57,8 @@ export function AccountSection() {
     if (newPw) { body.password = newPw; body.oldPassword = currentPw; }
 
     try {
-      const res = await fetch(`/api/users/${user!.id}`, {
+      const res = await api(`/api/users/${user!.id}`, {
         method: 'PUT',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
       if (!res.ok) {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { WizardShell, WizardButtons } from './WizardShell';
 import { ColourPicker, autoAssignColour } from '@/shared/components/ColourPicker';
+import { api } from '@/shared/lib/traccar';
 import type { OnboardingState } from '../hooks/useOnboardingState';
 
 interface ColourStepProps {
@@ -17,7 +18,7 @@ export function ColourStep({ state, onUpdate, onNext, onBack }: ColourStepProps)
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/backend/colours', { credentials: 'include' })
+    api('/backend/colours')
       .then((r) => r.json())
       .then((data: { colour_hex: string }[]) => {
         const taken = data.map((d) => d.colour_hex);
@@ -32,10 +33,8 @@ export function ColourStep({ state, onUpdate, onNext, onBack }: ColourStepProps)
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch('/backend/users/me/colour', {
+      const res = await api('/backend/users/me/colour', {
         method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ colour: selected }),
       });
       if (!res.ok) { setError('Could not save colour. Retry.'); setSaving(false); return; }

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { api } from '@/shared/lib/traccar';
 
 export interface AuthUser {
   id: number;
@@ -26,7 +27,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   hydrate: async () => {
     set({ loading: true, error: null });
     try {
-      const res = await fetch('/backend/users/me', { credentials: 'include' });
+      const res = await api('/backend/users/me');
       if (res.status === 401) {
         set({ user: null, loading: false });
         return;

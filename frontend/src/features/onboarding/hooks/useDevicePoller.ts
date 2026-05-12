@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { api } from '@/shared/lib/traccar';
 
 const POLL_INTERVAL_MS = 10_000;
 const MAX_ATTEMPTS = 12; // 2 minutes
@@ -32,7 +33,7 @@ export function useDevicePoller({ traccarDeviceId, enabled, onSuccess, onTimeout
 
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch('/api/positions', { credentials: 'include' });
+        const res = await api('/api/positions');
         if (!res.ok || cancelled) return;
 
         const positions: Array<{ deviceId: number; fixTime: string }> = await res.json();

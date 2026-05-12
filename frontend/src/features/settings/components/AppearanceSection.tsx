@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ColourPicker, autoAssignColour } from '@/shared/components/ColourPicker';
-import { useAuth } from '@/shared/hooks/useAuth';
 import { useAuthStore } from '@/stores/auth.store';
+import { api } from '@/shared/lib/traccar';
 
 export function AppearanceSection() {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const setUser = useAuthStore((s) => s.hydrate);
 
   const [occupied,   setOccupied]   = useState<string[]>([]);
@@ -15,7 +15,7 @@ export function AppearanceSection() {
   const [error,      setError]      = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/backend/colours', { credentials: 'include' })
+    api('/backend/colours')
       .then((r) => r.json())
       .then((data: { user_id: number; colour_hex: string }[]) => {
         // Exclude own colour from occupied list so user can re-select same colour
@@ -35,10 +35,8 @@ export function AppearanceSection() {
     // Optimistic
     setSaved(selected);
     try {
-      const res = await fetch('/backend/users/me/colour', {
+      const res = await api('/backend/users/me/colour', {
         method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ colour: selected }),
       });
       if (!res.ok) {

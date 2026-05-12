@@ -54,6 +54,7 @@ export async function getMembers(req: Request): Promise<Response> {
     return {
       userId: m.user_id,
       traccarUserId: m.traccar_user_id,
+      traccarDeviceId: deviceMap.get(m.user_id) ?? null,
       role: m.role,
       joinedAt: m.joined_at,
       name: (tu as any).name ?? '',

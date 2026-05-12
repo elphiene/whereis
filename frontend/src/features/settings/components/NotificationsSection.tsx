@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuthStore } from '@/stores/auth.store';
+import { api } from '@/shared/lib/traccar';
 import { useOnboardingState } from '@/features/onboarding/hooks/useOnboardingState';
 import QRCode from 'qrcode';
 
@@ -23,7 +24,7 @@ function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
 }
 
 export function NotificationsSection() {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const { state: onbState } = useOnboardingState();
 
   const [prefs,       setPrefs]       = useState<PrefsMap>(() =>
@@ -39,7 +40,7 @@ export function NotificationsSection() {
   const [error,       setError]        = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/backend/notifications/prefs', { credentials: 'include' })
+    api('/backend/notifications/prefs')
       .then((r) => r.json())
       .then((data: { prefs: { event_type: string; scope: string; enabled: number }[]; ntfy: { topic: string; enabled: number } | null }) => {
         if (data.prefs.length > 0) {
@@ -76,9 +77,8 @@ export function NotificationsSection() {
         { event_type: e.key, scope: 'own',    enabled: prefs[e.key]?.own    ?? false },
         { event_type: e.key, scope: 'anyone', enabled: prefs[e.key]?.anyone ?? false },
       ]);
-      const res = await fetch('/backend/notifications/prefs', {
-        method: 'PUT', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await api('/backend/notifications/prefs', {
+        method: 'PUT',
         body: JSON.stringify({ prefs: prefsArray, ntfyTopic, ntfyEnabled }),
       });
       if (!res.ok) { setError('Save failed.'); return; }
@@ -90,7 +90,7 @@ export function NotificationsSection() {
   async function handleTest() {
     setTesting(true);
     try {
-      const res = await fetch('/backend/notify/test', { method: 'POST', credentials: 'include' });
+      const res = await api('/backend/notify/test', { method: 'POST' });
       const body = await res.json();
       if (body.error) setError(body.error);
       else { setToast('Test sent!'); setTimeout(() => setToast(null), 2000); }

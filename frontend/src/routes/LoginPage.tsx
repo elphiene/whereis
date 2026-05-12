@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import maplibregl from 'maplibre-gl';
 import { useAuthStore } from '@/stores/auth.store';
+import { api } from '@/shared/lib/traccar';
 
 const LIBERTY_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
 const MELBOURNE: [number, number] = [144.9631, -37.8136];
@@ -78,10 +79,8 @@ export function LoginPage() {
     setSubmitting(true);
 
     try {
-      const res = await fetch('/api/session', {
+      const res = await api('/api/session', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
