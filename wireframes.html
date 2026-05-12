@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhereIs? — UI wireframes</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Orbitron:wght@800&display=swap');
+
+  :root {
+    --pink:       #ec4899;
+    --pink-soft:  rgba(236,72,153,0.12);
+    --pink-border:rgba(236,72,153,0.3);
+    --purple:     #9354d3;
+    --bg:         #080808;
+    --surface:    #101010;
+    --surface2:   #161616;
+    --border:     rgba(255,255,255,0.07);
+    --border-md:  rgba(255,255,255,0.12);
+    --text:       #f0f0f0;
+    --muted:      #bbb;
+    --muted2:     #888;
+    --radius:     10px;
+    --green:      #22c55e;
+    --amber:      #f59e0b;
+    --font:       'Inter', system-ui, sans-serif;
+    --mono:       'DM Mono', 'Courier New', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #050505;
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+  }
+
+  /* ── wireframe nav ── */
+  .wf-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: #080808;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: wrap;
+  }
+  .wf-logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--pink);
+    margin-right: 12px;
+    font-weight: 500;
+  }
+  .wf-btn {
+    padding: 6px 16px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: transparent;
+    color: #ccc;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .wf-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
+  .wf-btn.active { background: var(--pink-soft); border-color: var(--pink-border); color: var(--pink); }
+  .wf-spacer { margin-left: auto; font-family: var(--font); font-size: 13px; font-weight: 500; color: #888; }
+
+  /* ── screens ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── shared ── */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted2);
+    margin-bottom: 10px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 5px;
+    border: 1px solid var(--border-md);
+    color: var(--muted);
+    background: rgba(255,255,255,0.03);
+  }
+  .badge-online  { background: rgba(34,197,94,0.1);  border-color: rgba(34,197,94,0.3);  color: var(--green); }
+  .badge-moving  { background: rgba(236,72,153,0.1); border-color: var(--pink-border);    color: var(--pink);  }
+  .badge-offline { background: rgba(255,255,255,0.03); border-color: var(--border); color: var(--muted2); }
+  .btn {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 7px 16px;
+    border: 1px solid var(--pink-border);
+    border-radius: 7px;
+    color: var(--pink);
+    background: var(--pink-soft);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn:hover { background: rgba(236,72,153,0.2); }
+  .btn-ghost {
+    background: transparent;
+    border-color: var(--border-md);
+    color: var(--muted);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  /* ══════════════════════════════
+     LOGIN
+  ══════════════════════════════ */
+  .login-wrap {
+    min-height: calc(100vh - 45px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 20px;
+    position: relative; overflow: hidden;
+  }
+  #login-map {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  }
+  .login-overlay {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: rgba(0,0,0,0.55);
+  }
+  .ms-btn {
+    background: rgba(0,0,0,0.55); color: #fff; border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 6px; padding: 5px 10px; font-size: 11px; cursor: pointer;
+    font-family: inherit; transition: background 0.15s;
+  }
+  .ms-btn:hover { background: rgba(0,0,0,0.75); }
+  .ms-btn.active { background: #ec4899; border-color: #ec4899; }
+  .login-box {
+    width: 100%; max-width: 360px;
+  }
+  .login-head {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .login-head h1 {
+    font-size: 22px; font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .login-head p { font-size: 13px; color: var(--muted); font-family: var(--mono); }
+  .field-wrap { margin-bottom: 14px; }
+  .field-label {
+    display: block;
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 6px;
+    font-family: var(--mono);
+  }
+  .field {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-md);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field:focus { border-color: var(--pink-border); }
+  .field::placeholder { color: var(--muted2); }
+  .btn-full {
+    width: 100%;
+    padding: 11px;
+    background: var(--pink);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: opacity 0.15s;
+  }
+  .btn-full:hover { opacity: 0.88; }
+  .login-foot {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .login-foot a { color: var(--pink); text-decoration: none; }
+
+  /* ══════════════════════════════
+     LIVE MAP — DESKTOP
+  ══════════════════════════════ */
+  .map-layout {
+    display: flex;
+    height: calc(100vh - 45px);
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  /* app sidebar */
+  .app-sidebar {
+    width: 280px; min-width: 280px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .app-sidebar-top {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .app-logo { font-size: 15px; font-weight: 700; color: var(--text); }
+  .app-logo span { color: var(--pink); }
+  .sidebar-scroll { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .sidebar-scroll::-webkit-scrollbar { width: 3px; }
+  .sidebar-scroll::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+
+  /* friend card */
+  .friend-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .friend-card:hover { border-color: var(--border-md); background: #1a1a1a; }
+  .friend-card.selected { border-color: var(--pink-border); background: var(--pink-soft); }
+  .friend-info { flex: 1; min-width: 0; }
+  .friend-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .friend-meta { font-size: 12px; color: var(--muted); font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .friend-meta .speed { color: var(--pink); }
+  .friend-status { flex-shrink: 0; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .status-dot.online  { background: var(--green); box-shadow: 0 0 4px var(--green); }
+  .status-dot.moving  { background: var(--pink);  box-shadow: 0 0 4px var(--pink);  }
+  .status-dot.offline { background: var(--muted2); }
+
+  .sidebar-nav {
+    border-top: 1px solid var(--border);
+    padding: 10px 12px;
+    display: flex; gap: 6px;
+  }
+  .sidebar-nav-btn {
+    flex: 1; padding: 8px 6px;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 7px; color: var(--muted);
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+    text-align: center;
+  }
+  .sidebar-nav-btn:hover { color: var(--text); border-color: var(--border-md); }
+  .sidebar-nav-btn.active { color: var(--pink); border-color: var(--pink-border); background: var(--pink-soft); }
+
+  /* map area */
+  .map-area {
+    flex: 1; position: relative; overflow: hidden;
+  }
+  .map-mock {
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 40% 50%, #0e1520 0%, #080808 70%);
+    position: relative; overflow: hidden;
+  }
+  /* subtle road lines */
+  .road { position: absolute; background: rgba(255,255,255,0.05); }
+  .road.h { height: 1px; left: 0; right: 0; }
+  .road.h.main { height: 2px; background: rgba(255,255,255,0.08); }
+  .road.v { width: 1px; top: 0; bottom: 0; }
+  .road.v.main { width: 2px; background: rgba(255,255,255,0.08); }
+
+  /* markers */
+  .marker {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer;
+    z-index: 5;
+  }
+  .marker-pin {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 2.5px solid var(--pink);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.5), 0 0 0 3px var(--pink-soft);
+    position: relative;
+  }
+  .marker-pin::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid var(--pink);
+  }
+  .marker-pin.purple { border-color: var(--purple); box-shadow: 0 2px 12px rgba(0,0,0,0.5), 0 0 0 3px rgba(147,84,211,0.15); }
+  .marker-pin.purple::after { border-top-color: var(--purple); }
+  .marker-pin.green  { border-color: var(--green);  box-shadow: 0 2px 12px rgba(0,0,0,0.5), 0 0 0 3px rgba(34,197,94,0.12); }
+  .marker-pin.green::after  { border-top-color: var(--green);  }
+  .marker-label {
+    margin-top: 10px;
+    font-size: 11px; font-weight: 600;
+    color: var(--text);
+    background: rgba(8,8,8,0.85);
+    padding: 2px 8px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+  }
+
+  /* geofence */
+  .geofence {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px dashed rgba(236,72,153,0.3);
+    background: rgba(236,72,153,0.04);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .geofence-tag {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(236,72,153,0.5);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* map top bar */
+  .map-topbar {
+    position: absolute; top: 14px; left: 14px; right: 14px;
+    display: flex; gap: 8px; z-index: 10;
+  }
+  .map-search {
+    flex: 1; max-width: 260px;
+    background: rgba(8,8,8,0.88);
+    border: 1px solid var(--border-md);
+    border-radius: 9px;
+    padding: 9px 14px;
+    display: flex; align-items: center; gap: 8px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.4);
+  }
+  .map-search input {
+    background: none; border: none; color: var(--muted);
+    font-family: var(--mono); font-size: 12px; font-weight: 500; flex: 1; outline: none;
+  }
+  .map-search-icon { color: var(--muted2); font-size: 13px; }
+
+  /* info popup */
+  .info-popup {
+    position: absolute; top: 62px; left: 50%; transform: translateX(-50%);
+    background: rgba(8,8,8,0.96);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    min-width: 220px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+    backdrop-filter: blur(12px);
+    z-index: 20;
+  }
+  .popup-name {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .popup-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .popup-row:last-child { border: none; }
+  .popup-row .k { color: var(--muted); font-family: var(--mono); }
+  .popup-row .v { color: var(--text); font-weight: 500; }
+  .popup-row .pink { color: var(--pink); }
+  .popup-actions {
+    display: flex; gap: 6px; margin-top: 12px;
+  }
+  .popup-actions .btn { flex: 1; text-align: center; font-size: 11px; padding: 6px 0; }
+
+  /* FABs */
+  .map-fabs {
+    position: absolute; bottom: 20px; right: 16px;
+    display: flex; flex-direction: column; gap: 6px; z-index: 10;
+  }
+  .fab {
+    width: 40px; height: 40px;
+    background: rgba(8,8,8,0.9);
+    border: 1px solid var(--border-md);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    backdrop-filter: blur(6px);
+    transition: border-color 0.15s;
+  }
+  .fab:hover { border-color: rgba(255,255,255,0.2); }
+  .fab.pink { border-color: var(--pink-border); background: var(--pink-soft); }
+
+  /* ══════════════════════════════
+     MOBILE
+  ══════════════════════════════ */
+  .mobile-wrap {
+    min-height: calc(100vh - 45px);
+    background: var(--bg);
+    display: flex; justify-content: center; align-items: flex-start;
+    padding: 32px 20px;
+    gap: 32px; flex-wrap: wrap;
+  }
+  .phone {
+    width: 300px;
+    background: #0a0a0a;
+    border-radius: 32px;
+    border: 1px solid var(--border-md);
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+  }
+  .phone-bar {
+    background: #000; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .phone-pill { width: 72px; height: 8px; background: #111; border-radius: 5px; }
+  .phone-map {
+    height: 360px;
+    background: radial-gradient(ellipse at 40% 50%, #0e1520 0%, #080808 70%);
+    position: relative; overflow: hidden;
+  }
+  .phone-topbar {
+    position: absolute; top: 10px; left: 10px; right: 10px; z-index: 5;
+  }
+  .phone-search {
+    background: rgba(8,8,8,0.88);
+    border: 1px solid var(--border-md);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex; gap: 8px; align-items: center;
+    backdrop-filter: blur(8px);
+  }
+  .phone-search span { font-family: var(--mono); font-size: 12px; font-weight: 500; font-weight: 500; color: var(--muted2); }
+  .phone-avatars {
+    position: absolute; top: 10px; right: 10px;
+    display: flex; flex-direction: column; gap: 6px; z-index: 5;
+  }
+  .phone-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--pink);
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    box-shadow: 0 0 0 2px var(--pink-soft);
+  }
+  .phone-avatar.purple { border-color: var(--purple); box-shadow: 0 0 0 2px rgba(147,84,211,0.15); }
+  .phone-avatar.green  { border-color: var(--green);  box-shadow: 0 0 0 2px rgba(34,197,94,0.1);  }
+  .phone-avatar.dim    { border-color: var(--muted2); box-shadow: none; opacity: 0.5; }
+  .phone-fabs {
+    position: absolute; bottom: 10px; right: 10px;
+    display: flex; flex-direction: column; gap: 6px; z-index: 5;
+  }
+  .phone-fab {
+    width: 36px; height: 36px;
+    background: rgba(8,8,8,0.9);
+    border: 1px solid var(--border-md);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .phone-fab.pink { border-color: var(--pink-border); background: var(--pink-soft); }
+
+  /* bottom sheet */
+  .sheet {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+  .sheet-handle { display: flex; justify-content: center; padding: 8px; }
+  .sheet-handle-bar { width: 32px; height: 3px; background: var(--border-md); border-radius: 2px; }
+  .sheet-content { padding: 0 14px 14px; }
+  .sheet-friend {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 12px;
+  }
+  .sheet-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .sheet-sub  { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+  .sheet-sub .pink { color: var(--pink); }
+  .sheet-actions { display: flex; gap: 6px; }
+  .sheet-actions .btn { flex: 1; text-align: center; font-size: 11px; padding: 7px 0; }
+
+  .phone-nav {
+    display: flex;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .phone-nav-item {
+    flex: 1; padding: 10px 4px;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--muted2);
+    cursor: pointer;
+  }
+  .phone-nav-item span { font-size: 17px; }
+  .phone-nav-item.active { color: var(--pink); }
+  .phone-caption { font-family: var(--mono); font-size: 12px; font-weight: 500; font-weight: 500; color: var(--muted2); text-align: center; margin-top: 10px; }
+
+  /* ══════════════════════════════
+     STATS
+  ══════════════════════════════ */
+  .stats-wrap {
+    min-height: calc(100vh - 45px);
+    background: var(--bg); padding: 28px 24px;
+    overflow-y: auto;
+  }
+  .page-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; flex-wrap: wrap;
+    gap: 16px; margin-bottom: 24px;
+  }
+  .page-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .page-sub   { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+  .chips { display: flex; gap: 5px; flex-wrap: wrap; }
+  .chip {
+    padding: 5px 12px;
+    background: var(--surface); border: 1px solid var(--border-md);
+    border-radius: 6px; color: var(--muted); font-family: var(--mono); font-size: 12px; font-weight: 500; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .chip.active { background: var(--pink-soft); border-color: var(--pink-border); color: var(--pink); }
+  .stat-cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 700px) { .stat-cards { grid-template-columns: repeat(2,1fr); } }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+  }
+  .stat-card-label { font-family: var(--mono); font-size: 12px; font-weight: 500; font-weight: 500; color: var(--muted); margin-bottom: 8px; }
+  .stat-card-value { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 3px; }
+  .stat-card-value.pink { color: var(--pink); }
+  .stat-card-unit  { font-size: 12px; color: var(--muted); }
+
+  /* leaderboard */
+  .leader-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 10px; margin-bottom: 20px; }
+  .leader-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px;
+    cursor: pointer; transition: border-color 0.15s;
+  }
+  .leader-card:hover { border-color: var(--border-md); }
+  .leader-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .leader-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .leader-tag  { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--muted); }
+  .leader-stat { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .leader-stat:last-of-type { border: none; }
+  .leader-stat .k { color: var(--muted); font-family: var(--mono); }
+  .leader-stat .v { color: var(--text); font-weight: 500; }
+  .leader-stat .pink { color: var(--pink); }
+  .progress-bar { height: 2px; background: var(--border); border-radius: 1px; margin-top: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--pink); border-radius: 1px; }
+
+  /* charts */
+  .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 700px) { .chart-row { grid-template-columns: 1fr; } }
+  .chart-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+  }
+  .chart-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .chart-sub   { font-family: var(--mono); font-size: 12px; font-weight: 500; font-weight: 500; color: var(--muted); margin-bottom: 14px; }
+  .bar-chart-area { display: flex; align-items: flex-end; gap: 6px; height: 90px; margin-bottom: 8px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--pink); opacity: 0.7; transition: opacity 0.15s; cursor: pointer; }
+  .bar:hover { opacity: 1; }
+  .bar.purple { background: var(--purple); }
+  .bar-day { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--muted2); }
+  .area-svg { width: 100%; height: 80px; margin-bottom: 6px; }
+
+  /* events */
+  .event-list { display: flex; flex-direction: column; }
+  .event-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .event-row:last-child { border: none; }
+  .event-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .event-text { flex: 1; color: var(--text); line-height: 1.4; }
+  .event-text .sub { color: var(--muted); font-size: 11px; font-family: var(--mono); margin-top: 2px; }
+  .event-time { font-family: var(--mono); font-size: 12px; font-weight: 500; font-weight: 500; color: var(--muted2); flex-shrink: 0; }
+
+  /* ══════════════════════════════
+     HISTORY
+  ══════════════════════════════ */
+  .history-layout {
+    display: flex; height: calc(100vh - 45px);
+    overflow: hidden; background: var(--bg);
+  }
+  .history-sidebar {
+    width: 280px; min-width: 280px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .history-top { padding: 14px 14px 10px; border-bottom: 1px solid var(--border); }
+  .history-controls { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+  .select {
+    background: var(--surface2); border: 1px solid var(--border-md);
+    border-radius: 8px; color: var(--text);
+    font-family: var(--mono); font-size: 12px; font-weight: 500;
+    padding: 8px 12px; width: 100%; outline: none; appearance: none;
+  }
+  .trip-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
+  .trip-item {
+    padding: 10px 12px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .trip-item:hover { border-color: var(--border-md); background: #1a1a1a; }
+  .trip-item.active { border-color: var(--border-md); border-left-color: var(--pink); background: var(--pink-soft); }
+  .trip-time { font-family: var(--mono); font-size: 12px; font-weight: 500; font-weight: 500; color: var(--muted); margin-bottom: 4px; }
+  .trip-stats-row { display: flex; gap: 10px; font-size: 13px; font-weight: 600; color: var(--text); }
+  .trip-stats-row .dist { color: var(--pink); }
+  .trip-route-text { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .trip-summary {
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono); font-size: 12px; font-weight: 500; font-weight: 500;
+    color: var(--muted); display: flex; gap: 14px;
+  }
+  .trip-summary .v { color: var(--text); font-weight: 600; }
+
+  /* history map */
+  .history-map {
+    flex: 1; position: relative; overflow: hidden;
+    background: radial-gradient(ellipse at 40% 50%, #0e1520 0%, #080808 70%);
+  }
+  .exit-btn {
+    position: absolute; top: 14px; right: 14px; z-index: 10;
+    background: rgba(8,8,8,0.9); border: 1px solid var(--border-md);
+    border-radius: 8px; color: var(--muted); font-family: var(--mono);
+    font-size: 11px; padding: 8px 14px; cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: all 0.15s;
+  }
+  .exit-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  /* trip detail popup */
+  .trip-popup {
+    position: absolute; top: 58px; right: 14px;
+    background: rgba(8,8,8,0.96);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius);
+    padding: 14px 16px; min-width: 200px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+    backdrop-filter: blur(12px); z-index: 10;
+  }
+  .popup-trip-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+
+  /* polyline svg */
+  .poly-svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+
+  /* route pin */
+  .route-pin {
+    position: absolute;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%); z-index: 5;
+  }
+  .route-pin.start { background: var(--green); border: 2px solid var(--bg); box-shadow: 0 0 0 3px rgba(34,197,94,0.2); }
+  .route-pin.end   { background: var(--pink);  border: 2px solid var(--bg); box-shadow: 0 0 0 3px var(--pink-soft); }
+
+  /* ══════════════════════════════
+     ONBOARDING
+  ══════════════════════════════ */
+  .onboarding-wrap {
+    min-height: calc(100vh - 45px);
+    background: var(--bg); padding: 32px 24px;
+    overflow-y: auto;
+  }
+  .onboarding-grid {
+    display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;
+  }
+  .wizard-card {
+    width: 300px;
+    background: var(--surface);
+    border: 1px solid var(--border-md);
+    border-radius: 14px;
+    padding: 24px 20px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .wizard-caption {
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    color: var(--muted2); text-align: center; margin-top: 6px;
+  }
+  .step-dots { display: flex; justify-content: center; gap: 6px; }
+  .step-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border-md); }
+  .step-dot.active { background: var(--pink); }
+  .step-dot.done   { background: rgba(236,72,153,0.35); }
+  .wizard-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .wizard-sub   { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+  .colour-row { display: flex; align-items: center; gap: 10px; }
+  .colour-swatches { display: flex; gap: 7px; flex-wrap: wrap; }
+  .swatch { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; transition: transform 0.1s; border: 2px solid transparent; }
+  .swatch.selected { border-color: var(--text); transform: scale(1.2); }
+  .swatch.occupied { opacity: 0.2; cursor: not-allowed; }
+  .qr-mock {
+    width: 90px; height: 90px; flex-shrink: 0;
+    background: var(--surface2); border: 1px solid var(--border-md);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--muted2); font-family: var(--mono); text-align: center;
+  }
+  .accordion {
+    border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  }
+  .accordion-head {
+    padding: 9px 12px; font-family: var(--mono); font-size: 11px;
+    color: var(--muted); cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .accordion-body {
+    padding: 10px 12px; border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 7px;
+  }
+  .copy-row { display: flex; gap: 5px; }
+  .copy-row .field { font-family: var(--mono); font-size: 10px; padding: 6px 8px; }
+  .copy-btn {
+    padding: 6px 8px; background: var(--surface2);
+    border: 1px solid var(--border-md); border-radius: 5px;
+    font-size: 12px; cursor: pointer; color: var(--muted); flex-shrink: 0;
+  }
+  .pulse-wrap {
+    position: relative; width: 72px; height: 72px;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto;
+  }
+  .pulse-ring {
+    position: absolute; border-radius: 50%;
+    border: 1.5px solid rgba(236,72,153,0.3);
+    animation: pring 2s ease-out infinite;
+  }
+  .pulse-ring:nth-child(2) { animation-delay: 0.7s; }
+  .pulse-ring:nth-child(3) { animation-delay: 1.4s; }
+  @keyframes pring {
+    0%   { width: 38px; height: 38px; opacity: 0.9; }
+    100% { width: 72px; height: 72px; opacity: 0; }
+  }
+  .pulse-av {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #fff; z-index: 2; position: relative;
+  }
+  .success-av-wrap { position: relative; width: 64px; height: 64px; margin: 0 auto; }
+  .success-av {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700; color: #fff;
+  }
+  .success-ring {
+    position: absolute; inset: -5px; border-radius: 50%;
+    border: 2px solid var(--green); box-shadow: 0 0 14px rgba(34,197,94,0.3);
+  }
+  .invite-hero { text-align: center; }
+  .invite-av-lg {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), #6366f1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin: 0 auto 10px;
+  }
+  .invite-hero h2 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .invite-hero p  { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+  .help-steps { display: flex; flex-direction: column; gap: 6px; }
+  .help-step {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 12px; color: var(--muted); line-height: 1.5;
+  }
+  .help-num {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--surface2); border: 1px solid var(--border-md);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 10px; color: var(--muted2);
+    flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* ══════════════════════════════
+     SETTINGS
+  ══════════════════════════════ */
+  .settings-wrap {
+    min-height: calc(100vh - 45px);
+    background: var(--bg); overflow-y: auto;
+  }
+  .settings-topbar {
+    padding: 11px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface); position: sticky; top: 0; z-index: 10;
+  }
+  .settings-back { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; }
+  .settings-back:hover { color: var(--text); }
+  .settings-content {
+    max-width: 640px; margin: 0 auto; padding: 28px 24px;
+    display: flex; flex-direction: column; gap: 28px;
+  }
+  .settings-section {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  }
+  .settings-head {
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    font-size: 14px; font-weight: 700; color: var(--text);
+  }
+  .settings-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .settings-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .settings-lbl { font-size: 13px; color: var(--text); font-weight: 500; }
+  .settings-sub { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+  .toggle {
+    width: 34px; height: 19px; background: var(--border-md); border-radius: 10px;
+    cursor: pointer; position: relative; flex-shrink: 0; transition: background 0.2s;
+  }
+  .toggle.on { background: var(--pink); }
+  .toggle::after {
+    content: ''; position: absolute;
+    width: 13px; height: 13px; border-radius: 50%;
+    background: #fff; top: 3px; left: 3px; transition: left 0.2s;
+  }
+  .toggle.on::after { left: 18px; }
+  .notif-table { width: 100%; border-collapse: collapse; }
+  .notif-table th {
+    font-family: var(--mono); font-size: 11px; color: var(--muted2);
+    font-weight: 500; text-align: center; padding-bottom: 8px;
+  }
+  .notif-table th:first-child { text-align: left; }
+  .notif-table td { padding: 8px 6px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text); text-align: center; }
+  .notif-table td:first-child { text-align: left; }
+  .dot-on  { display:inline-block; width:14px; height:14px; border-radius:50%; background:var(--pink); vertical-align:middle; }
+  .dot-off { display:inline-block; width:14px; height:14px; border-radius:50%; background:var(--border-md); vertical-align:middle; }
+  .ntfy-divider { border-top: 1px solid var(--border); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .ntfy-row { display: flex; gap: 6px; align-items: center; }
+  .ntfy-row .field { font-family: var(--mono); font-size: 10px; padding: 7px 10px; }
+  .expiry-chips { display: flex; gap: 5px; }
+  .invite-link-box {
+    background: var(--surface2); border: 1px solid var(--border-md);
+    border-radius: 8px; padding: 9px 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .invite-url { font-family: var(--mono); font-size: 10px; color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .member-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-top: 1px solid var(--border);
+  }
+  .member-row:first-child { border-top: none; padding-top: 0; }
+  .member-info { flex: 1; }
+  .member-name { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+  .member-meta { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+  .danger-section { border-color: rgba(239,68,68,0.2); background: rgba(239,68,68,0.02); }
+  .danger-head { padding: 14px 20px; border-bottom: 1px solid rgba(239,68,68,0.15); font-size: 14px; font-weight: 700; color: #ef4444; }
+  .btn-danger {
+    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+    color: #ef4444; font-family: var(--mono); font-size: 12px;
+    padding: 8px 16px; border-radius: 7px; cursor: pointer;
+  }
+
+  /* ══════════════════════════════
+     GEOFENCE
+  ══════════════════════════════ */
+  .geofence-layout {
+    display: flex; height: calc(100vh - 45px);
+    overflow: hidden; background: var(--bg);
+  }
+  .geofence-sidebar {
+    width: 280px; min-width: 280px; background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .geofence-top {
+    padding: 14px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .zone-list { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .zone-item {
+    padding: 10px 12px; background: var(--surface2);
+    border: 1px solid var(--border); border-left: 3px solid transparent;
+    border-radius: var(--radius); cursor: pointer; transition: all 0.15s;
+  }
+  .zone-item.active { border-color: var(--border-md); border-left-color: var(--pink); background: var(--pink-soft); }
+  .zone-item:hover:not(.active) { border-color: var(--border-md); }
+  .zone-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .zone-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .zone-config { padding: 14px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+  .zone-config-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .radio-group { display: flex; gap: 5px; flex-wrap: wrap; }
+  .radio-chip {
+    padding: 4px 10px; background: var(--surface2); border: 1px solid var(--border-md);
+    border-radius: 5px; font-family: var(--mono); font-size: 11px; color: var(--muted); cursor: pointer;
+  }
+  .radio-chip.active { background: var(--pink-soft); border-color: var(--pink-border); color: var(--pink); }
+  .geofence-map { flex: 1; position: relative; overflow: hidden; background: radial-gradient(ellipse at 40% 50%, #0e1520 0%, #080808 70%); }
+  .draw-toolbar {
+    position: absolute; top: 14px; left: 14px;
+    background: rgba(8,8,8,0.9); border: 1px solid var(--border-md);
+    border-radius: 9px; padding: 6px;
+    display: flex; flex-direction: column; gap: 3px;
+    backdrop-filter: blur(8px); z-index: 10;
+  }
+  .draw-tool {
+    width: 34px; height: 34px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; cursor: pointer;
+    border: 1px solid transparent; transition: all 0.15s;
+  }
+  .draw-tool:hover { background: rgba(255,255,255,0.05); border-color: var(--border); }
+  .draw-tool.active { background: var(--pink-soft); border-color: var(--pink-border); }
+  .radius-control {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: rgba(8,8,8,0.9); border: 1px solid var(--border-md);
+    border-radius: 9px; padding: 9px 16px;
+    display: flex; align-items: center; gap: 10px;
+    backdrop-filter: blur(8px); z-index: 10; white-space: nowrap;
+  }
+  .radius-control label { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .radius-input {
+    width: 70px; background: var(--surface2); border: 1px solid var(--border-md);
+    border-radius: 6px; color: var(--text);
+    font-family: var(--mono); font-size: 12px; padding: 5px 8px; outline: none;
+  }
+  .gf-drawing {
+    position: absolute; border-radius: 50%;
+    border: 2px solid var(--pink); background: rgba(236,72,153,0.08);
+    transform: translate(-50%, -50%); pointer-events: none;
+  }
+  .gf-centre {
+    position: absolute; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--pink); transform: translate(-50%, -50%); z-index: 5;
+  }
+  .gf-label {
+    position: absolute; transform: translateX(-50%);
+    font-family: var(--mono); font-size: 10px; color: rgba(236,72,153,0.6);
+    pointer-events: none; white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<nav class="wf-nav">
+  <span class="wf-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 125 568 310" height="30" style="display:block;"><text style="font-family:Orbitron,sans-serif;font-size:94.3px;font-weight:800;" transform="translate(63.43 262.72)"><tspan fill="#ec4899" letter-spacing="-0.03em">W</tspan><tspan fill="#ffffff">here</tspan><tspan fill="#ec4899">Is</tspan></text><rect fill="#ffffff" x="394.56" y="382.46" width="44.89" height="44.89"/><path fill="#ec4899" d="M523.49,134.95H40.9c-22.59,0-40.9,18.31-40.9,40.9h0v101.05c24.79,0,44.89-20.1,44.89-44.89v-56.16h478.6v115.88h-88.03c-22.59,0-40.9,18.31-40.9,40.9v44.89h44.89v-44.89h88.03c22.59,0,40.9-18.31,40.9-40.9v-111.89c0-24.79-20.1-44.89-44.89-44.89Z"/></svg>
+  </span>
+  <button class="wf-btn active" onclick="show('login', this)">login</button>
+  <button class="wf-btn" onclick="show('map', this)">live map</button>
+  <button class="wf-btn" onclick="show('mobile', this)">mobile</button>
+  <button class="wf-btn" onclick="show('stats', this)">stats</button>
+  <button class="wf-btn" onclick="show('history', this)">history</button>
+  <button class="wf-btn" onclick="show('onboarding', this)">onboarding</button>
+  <button class="wf-btn" onclick="show('settings', this)">settings</button>
+  <button class="wf-btn" onclick="show('geofence', this)">geofences</button>
+  <span class="wf-spacer">wireframes</span>
+</nav>
+
+<!-- ═══════════ LOGIN ═══════════ -->
+<div id="login" class="screen active">
+  <div class="login-wrap">
+    <div id="login-map"></div>
+    <div class="login-overlay"></div>
+    <div id="map-style-switcher" style="position:absolute;bottom:16px;left:16px;z-index:10;display:flex;gap:6px;">
+      <button onclick="setMapStyle('liberty')" class="ms-btn active" id="ms-liberty">Liberty</button>
+      <button onclick="setMapStyle('positron')" class="ms-btn" id="ms-positron">Positron</button>
+      <button onclick="setMapStyle('bright')" class="ms-btn" id="ms-bright">Bright</button>
+      <button onclick="setMapStyle('dark')" class="ms-btn" id="ms-dark">Dark Matter</button>
+    </div>
+    <div class="login-box" style="position:relative;z-index:2;">
+      <div class="login-head">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 125 568 310" width="270" style="display:block;margin:0 auto 14px;"><text style="font-family:Orbitron,sans-serif;font-size:94.3px;font-weight:800;" transform="translate(63.43 262.72)"><tspan fill="#ec4899" letter-spacing="-0.03em">W</tspan><tspan fill="#231f20">here</tspan><tspan fill="#ec4899">Is</tspan></text><rect fill="#231f20" x="394.56" y="382.46" width="44.89" height="44.89"/><path fill="#ec4899" d="M523.49,134.95H40.9c-22.59,0-40.9,18.31-40.9,40.9h0v101.05c24.79,0,44.89-20.1,44.89-44.89v-56.16h478.6v115.88h-88.03c-22.59,0-40.9,18.31-40.9,40.9v44.89h44.89v-44.89h88.03c22.59,0,40.9-18.31,40.9-40.9v-111.89c0-24.79-20.1-44.89-44.89-44.89Z"/></svg>
+        <p>private location network</p>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">email</label>
+        <input class="field" type="text" placeholder="you@example.com">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">password</label>
+        <input class="field" type="password" placeholder="••••••••">
+      </div>
+      <button class="btn-full">sign in</button>
+      <div class="login-foot">got an invite? <a href="#">create account</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ LIVE MAP ═══════════ -->
+<div id="map" class="screen">
+  <div class="map-layout">
+    <div class="app-sidebar">
+      <div class="app-sidebar-top">
+        <div class="app-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 125 568 310" height="22" style="display:block;"><text style="font-family:Orbitron,sans-serif;font-size:94.3px;font-weight:800;" transform="translate(63.43 262.72)"><tspan fill="#ec4899" letter-spacing="-0.03em">W</tspan><tspan fill="#ffffff">here</tspan><tspan fill="#ec4899">Is</tspan></text><rect fill="#2a2a2a" x="394.56" y="382.46" width="44.89" height="44.89"/><path fill="#ec4899" d="M523.49,134.95H40.9c-22.59,0-40.9,18.31-40.9,40.9h0v101.05c24.79,0,44.89-20.1,44.89-44.89v-56.16h478.6v115.88h-88.03c-22.59,0-40.9,18.31-40.9,40.9v44.89h44.89v-44.89h88.03c22.59,0,40.9-18.31,40.9-40.9v-111.89c0-24.79-20.1-44.89-44.89-44.89Z"/></svg>
+        </div>
+        <span class="tag badge-online" style="font-size:11px;">3 online</span>
+      </div>
+
+      <div class="sidebar-scroll">
+        <div class="section-label" style="padding:4px 4px 0;">friends</div>
+
+        <div class="friend-card selected">
+          <div class="avatar">E</div>
+          <div class="friend-info">
+            <div class="friend-name">El</div>
+            <div class="friend-meta"><span class="speed">72 km/h</span> · Princes Hwy</div>
+          </div>
+          <div class="friend-status"><div class="status-dot moving"></div></div>
+        </div>
+
+        <div class="friend-card">
+          <div class="avatar" style="background:linear-gradient(135deg,var(--purple),#6366f1)">M</div>
+          <div class="friend-info">
+            <div class="friend-name">Mia</div>
+            <div class="friend-meta">123 Church Rd · 6m ago</div>
+          </div>
+          <div class="friend-status"><div class="status-dot online"></div></div>
+        </div>
+
+        <div class="friend-card">
+          <div class="avatar" style="background:linear-gradient(135deg,#22c55e,#16a34a)">J</div>
+          <div class="friend-info">
+            <div class="friend-name">Jake</div>
+            <div class="friend-meta"><span class="speed">95 km/h</span> · M5 Motorway</div>
+          </div>
+          <div class="friend-status"><div class="status-dot moving"></div></div>
+        </div>
+
+        <div class="friend-card" style="opacity:0.5">
+          <div class="avatar" style="background:#222">S</div>
+          <div class="friend-info">
+            <div class="friend-name">Sam</div>
+            <div class="friend-meta">offline · 2h ago</div>
+          </div>
+          <div class="friend-status"><div class="status-dot offline"></div></div>
+        </div>
+      </div>
+
+      <div class="sidebar-nav">
+        <button class="sidebar-nav-btn active">🗺 map</button>
+        <button class="sidebar-nav-btn">📊 stats</button>
+        <button class="sidebar-nav-btn">⬡ zones</button>
+        <button class="sidebar-nav-btn">⚙</button>
+      </div>
+    </div>
+
+    <div class="map-area">
+      <div class="map-mock">
+        <div class="road h main" style="top:42%"></div>
+        <div class="road h" style="top:26%"></div>
+        <div class="road h" style="top:63%"></div>
+        <div class="road v main" style="left:37%"></div>
+        <div class="road v" style="left:62%"></div>
+        <div class="road v" style="left:21%"></div>
+
+        <div class="geofence" style="width:130px;height:130px;left:63%;top:54%;"></div>
+        <div class="geofence-tag" style="left:63%;top:44%;">home</div>
+
+        <div class="marker" style="left:49%;top:44%;">
+          <div class="marker-pin">🧑</div>
+          <div class="marker-label">El · 72 km/h</div>
+        </div>
+        <div class="marker" style="left:63%;top:56%;">
+          <div class="marker-pin purple">👩</div>
+          <div class="marker-label">Mia</div>
+        </div>
+        <div class="marker" style="left:26%;top:60%;">
+          <div class="marker-pin green">🧔</div>
+          <div class="marker-label">Jake · 95 km/h</div>
+        </div>
+
+        <div class="info-popup">
+          <div class="popup-name">🧑 El <span class="tag badge-moving" style="font-size:10px;">moving</span></div>
+          <div class="popup-row"><span class="k">location</span><span class="v">Princes Hwy, Sutherland</span></div>
+          <div class="popup-row"><span class="k">speed</span><span class="pink">72 km/h</span></div>
+          <div class="popup-row"><span class="k">battery</span><span class="v">84%</span></div>
+          <div class="popup-row"><span class="k">updated</span><span class="v">just now</span></div>
+          <div class="popup-actions">
+            <a class="btn" href="#">history</a>
+            <a class="btn btn-ghost" href="#">directions</a>
+          </div>
+        </div>
+
+        <div class="map-fabs">
+          <div class="fab pink">⊕</div>
+          <div class="fab">+</div>
+          <div class="fab">−</div>
+          <div class="fab">🗺</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MOBILE ═══════════ -->
+<div id="mobile" class="screen">
+  <div class="mobile-wrap">
+
+    <!-- phone 1: peek -->
+    <div>
+      <div class="phone">
+        <div class="phone-bar"><div class="phone-pill"></div></div>
+        <div class="phone-map">
+          <div class="road h main" style="top:45%;left:0;right:0;position:absolute;"></div>
+          <div class="road v main" style="left:42%;top:0;bottom:0;position:absolute;"></div>
+          <div class="road h" style="top:28%;left:0;right:0;position:absolute;"></div>
+
+          <div class="marker" style="left:44%;top:48%;">
+            <div class="marker-pin" style="width:32px;height:32px;font-size:14px;">🧑</div>
+          </div>
+          <div class="marker" style="left:67%;top:56%;">
+            <div class="marker-pin purple" style="width:28px;height:28px;font-size:12px;">👩</div>
+          </div>
+          <div class="marker" style="left:24%;top:62%;">
+            <div class="marker-pin green" style="width:28px;height:28px;font-size:12px;">🧔</div>
+          </div>
+
+          <div class="phone-avatars">
+            <div class="phone-avatar">E</div>
+            <div class="phone-avatar purple">M</div>
+            <div class="phone-avatar green">J</div>
+            <div class="phone-avatar dim">S</div>
+          </div>
+          <div class="phone-fabs">
+            <div class="phone-fab pink">⊕</div>
+            <div class="phone-fab">🗺</div>
+          </div>
+        </div>
+        <div class="sheet">
+          <div class="sheet-handle"><div class="sheet-handle-bar"></div></div>
+          <div class="sheet-content">
+            <div class="sheet-friend">
+              <div class="avatar">E</div>
+              <div>
+                <div class="sheet-name">El</div>
+                <div class="sheet-sub"><span class="pink">72 km/h</span> · Princes Hwy</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-nav">
+          <div class="phone-nav-item active"><span>🗺</span>map</div>
+          <div class="phone-nav-item"><span>👥</span>friends</div>
+          <div class="phone-nav-item"><span>📊</span>stats</div>
+          <div class="phone-nav-item"><span>⚙</span>settings</div>
+        </div>
+      </div>
+      <div class="phone-caption">live map — peek</div>
+    </div>
+
+    <!-- phone 2: sheet expanded -->
+    <div>
+      <div class="phone">
+        <div class="phone-bar"><div class="phone-pill"></div></div>
+        <div class="phone-map" style="height:200px;">
+          <div class="road h main" style="top:50%;left:0;right:0;position:absolute;"></div>
+          <div class="road v main" style="left:42%;top:0;bottom:0;position:absolute;"></div>
+          <div class="marker" style="left:44%;top:52%;">
+            <div class="marker-pin" style="width:32px;height:32px;font-size:14px;">🧑</div>
+          </div>
+        </div>
+        <div class="sheet">
+          <div class="sheet-handle"><div class="sheet-handle-bar"></div></div>
+          <div class="sheet-content">
+            <div class="sheet-friend">
+              <div class="avatar">E</div>
+              <div>
+                <div class="sheet-name">El</div>
+                <div class="sheet-sub"><span class="pink">72 km/h</span> · moving</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0;margin-bottom:12px;">
+              <div class="popup-row"><span class="k">location</span><span class="v" style="font-size:12px;">Princes Hwy, Sutherland</span></div>
+              <div class="popup-row"><span class="k">battery</span><span class="v" style="font-size:12px;">84%</span></div>
+              <div class="popup-row"><span class="k">heading</span><span class="v" style="font-size:12px;">NE</span></div>
+              <div class="popup-row"><span class="k">updated</span><span class="v" style="font-size:12px;">just now</span></div>
+            </div>
+            <div class="sheet-actions">
+              <a class="btn" href="#">history</a>
+              <a class="btn btn-ghost" href="#">directions</a>
+            </div>
+          </div>
+        </div>
+        <div class="phone-nav">
+          <div class="phone-nav-item active"><span>🗺</span>map</div>
+          <div class="phone-nav-item"><span>👥</span>friends</div>
+          <div class="phone-nav-item"><span>📊</span>stats</div>
+          <div class="phone-nav-item"><span>⚙</span>settings</div>
+        </div>
+      </div>
+      <div class="phone-caption">friend detail — expanded</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════ STATS ═══════════ -->
+<div id="stats" class="screen">
+  <div class="stats-wrap">
+    <div class="page-header">
+      <div>
+        <div class="section-label">module</div>
+        <div class="page-title">drive stats</div>
+        <div class="page-sub">group overview</div>
+      </div>
+      <div class="chips">
+        <button class="chip">today</button>
+        <button class="chip active">7 days</button>
+        <button class="chip">30 days</button>
+        <button class="chip">custom</button>
+      </div>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-card-label">total distance</div>
+        <div class="stat-card-value pink">847<span style="font-size:18px;color:var(--muted);font-weight:400"> km</span></div>
+        <div class="stat-card-unit">this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">trips</div>
+        <div class="stat-card-value">34</div>
+        <div class="stat-card-unit">across 3 drivers</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">max speed</div>
+        <div class="stat-card-value pink">114<span style="font-size:18px;color:var(--muted);font-weight:400"> km/h</span></div>
+        <div class="stat-card-unit">Jake · M5 Motorway</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">speed events</div>
+        <div class="stat-card-value">7</div>
+        <div class="stat-card-unit">overspeed alerts</div>
+      </div>
+    </div>
+
+    <div class="section-label">leaderboard</div>
+    <div class="leader-grid" style="margin-bottom:20px;">
+      <div class="leader-card" style="border-left:3px solid var(--pink);">
+        <div class="leader-top">
+          <div class="avatar">J</div>
+          <div><div class="leader-name">Jake</div><div class="leader-tag">most km</div></div>
+        </div>
+        <div class="leader-stat"><span class="k">distance</span><span class="pink">412 km</span></div>
+        <div class="leader-stat"><span class="k">trips</span><span class="v">16</span></div>
+        <div class="leader-stat"><span class="k">max speed</span><span class="v">114 km/h</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+      </div>
+      <div class="leader-card">
+        <div class="leader-top">
+          <div class="avatar">E</div>
+          <div><div class="leader-name">El</div><div class="leader-tag">most trips</div></div>
+        </div>
+        <div class="leader-stat"><span class="k">distance</span><span class="pink">298 km</span></div>
+        <div class="leader-stat"><span class="k">trips</span><span class="v">12</span></div>
+        <div class="leader-stat"><span class="k">max speed</span><span class="v">98 km/h</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:72%"></div></div>
+      </div>
+      <div class="leader-card">
+        <div class="leader-top">
+          <div class="avatar" style="background:linear-gradient(135deg,var(--purple),#6366f1)">M</div>
+          <div><div class="leader-name">Mia</div><div class="leader-tag"></div></div>
+        </div>
+        <div class="leader-stat"><span class="k">distance</span><span class="pink">137 km</span></div>
+        <div class="leader-stat"><span class="k">trips</span><span class="v">6</span></div>
+        <div class="leader-stat"><span class="k">max speed</span><span class="v">82 km/h</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:33%"></div></div>
+      </div>
+    </div>
+
+    <div class="chart-row">
+      <div class="chart-card">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;">
+          <div class="chart-title">distance / day</div>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted2);font-weight:500;">sample data</span>
+        </div>
+        <div class="chart-sub">km · last 7 days</div>
+        <div class="bar-chart-area">
+          <div style="display:flex;align-items:flex-end;gap:5px;height:72px;margin-bottom:5px;">
+            <div class="bar" style="flex:1;height:27px;"></div>
+            <div class="bar" style="flex:1;height:52px;"></div>
+            <div class="bar" style="flex:1;height:39px;"></div>
+            <div class="bar" style="flex:1;height:63px;"></div>
+            <div class="bar" style="flex:1;height:44px;"></div>
+            <div class="bar" style="flex:1;height:20px;"></div>
+            <div class="bar" style="flex:1;height:13px;"></div>
+          </div>
+          <div style="display:flex;gap:5px;">
+            <div class="bar-day" style="flex:1;text-align:center;">mon</div>
+            <div class="bar-day" style="flex:1;text-align:center;">tue</div>
+            <div class="bar-day" style="flex:1;text-align:center;">wed</div>
+            <div class="bar-day" style="flex:1;text-align:center;">thu</div>
+            <div class="bar-day" style="flex:1;text-align:center;">fri</div>
+            <div class="bar-day" style="flex:1;text-align:center;">sat</div>
+            <div class="bar-day" style="flex:1;text-align:center;">sun</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-title">recent events</div>
+        <div class="chart-sub">speed alerts & geofences</div>
+        <div class="event-list">
+          <div class="event-row">
+            <span class="event-icon">⚡</span>
+            <div class="event-text">
+              <strong>Jake</strong> exceeded 110 km/h on M5
+              <div class="sub">thu 09:14</div>
+            </div>
+          </div>
+          <div class="event-row">
+            <span class="event-icon">📍</span>
+            <div class="event-text">
+              <strong>Mia</strong> arrived at home
+              <div class="sub">thu 08:51</div>
+            </div>
+          </div>
+          <div class="event-row">
+            <span class="event-icon">⚡</span>
+            <div class="event-text">
+              <strong>El</strong> exceeded 100 km/h
+              <div class="sub">wed 17:32</div>
+            </div>
+          </div>
+          <div class="event-row">
+            <span class="event-icon">📍</span>
+            <div class="event-text">
+              <strong>Jake</strong> left work
+              <div class="sub">wed 16:58</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ HISTORY ═══════════ -->
+<div id="history" class="screen">
+  <div class="history-layout">
+    <div class="history-sidebar">
+      <div class="history-top">
+        <div class="section-label">location history</div>
+      </div>
+      <div class="history-controls">
+        <select class="select">
+          <option>El</option>
+          <option>Mia</option>
+          <option>Jake</option>
+        </select>
+        <div class="chips">
+          <button class="chip">today</button>
+          <button class="chip active">yesterday</button>
+          <button class="chip">7 days</button>
+        </div>
+      </div>
+      <div class="trip-list">
+        <div class="trip-item active">
+          <div class="trip-time">09:14 → 09:47</div>
+          <div class="trip-stats-row"><span class="dist">18.4 km</span><span>33 min</span><span>45 avg</span></div>
+          <div class="trip-route-text">123 Main St → 456 Church Rd</div>
+        </div>
+        <div class="trip-item">
+          <div class="trip-time">07:52 → 08:31</div>
+          <div class="trip-stats-row"><span class="dist">22.6 km</span><span>39 min</span><span>58 avg</span></div>
+          <div class="trip-route-text">Home → Work</div>
+        </div>
+        <div class="trip-item">
+          <div class="trip-time">06:10 → 06:25</div>
+          <div class="trip-stats-row"><span class="dist">11.1 km</span><span>15 min</span><span>44 avg</span></div>
+          <div class="trip-route-text">Home → Shops</div>
+        </div>
+      </div>
+      <div class="trip-summary">
+        <span>3 trips</span>
+        <span class="v">52.1 km</span>
+        <span>87 min</span>
+      </div>
+    </div>
+
+    <div class="history-map">
+      <div class="road h main" style="top:43%;left:0;right:0;position:absolute;"></div>
+      <div class="road v main" style="left:39%;top:0;bottom:0;position:absolute;"></div>
+      <div class="road h" style="top:26%;left:0;right:0;position:absolute;"></div>
+      <div class="road v" style="left:63%;top:0;bottom:0;position:absolute;"></div>
+
+      <svg class="poly-svg" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 280 320 C 310 295 360 270 410 248 C 460 226 500 210 550 190 C 590 175 630 165 670 158" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-opacity="0.9"/>
+        <path d="M 280 320 C 250 295 210 265 175 240 C 140 215 110 195 80 170" fill="none" stroke="#ec4899" stroke-width="2" stroke-opacity="0.2"/>
+        <path d="M 280 320 C 270 355 260 395 250 430 C 240 465 228 495 215 520" fill="none" stroke="#ec4899" stroke-width="2" stroke-opacity="0.2"/>
+      </svg>
+
+      <div class="route-pin start" style="left:280px;top:320px;"></div>
+      <div class="route-pin end"   style="left:670px;top:158px;"></div>
+
+      <div class="trip-popup">
+        <div class="popup-trip-title">trip · wed 7 may</div>
+        <div class="popup-row"><span class="k">time</span><span class="v">09:14 → 09:47</span></div>
+        <div class="popup-row"><span class="k">duration</span><span class="v">33 min</span></div>
+        <div class="popup-row"><span class="k">distance</span><span class="pink">18.4 km</span></div>
+        <div class="popup-row"><span class="k">avg speed</span><span class="v">45 km/h</span></div>
+        <div class="popup-row"><span class="k">max speed</span><span class="v">98 km/h</span></div>
+        <div class="popup-row"><span class="k">from</span><span class="v">123 Main St</span></div>
+        <div class="popup-row"><span class="k">to</span><span class="v">456 Church Rd</span></div>
+      </div>
+
+      <button class="exit-btn">← back to live</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ONBOARDING ═══════════ -->
+<div id="onboarding" class="screen">
+  <div class="onboarding-wrap">
+    <div style="max-width:1200px;margin:0 auto;">
+      <div class="section-label" style="margin-bottom:20px;">onboarding wizard — all states</div>
+      <div class="onboarding-grid">
+
+        <!-- Invite Landing -->
+        <div>
+          <div class="wizard-card">
+            <div class="invite-hero">
+              <div class="invite-av-lg">A</div>
+              <h2>Alex invited you</h2>
+              <p>Share your location with people you trust.</p>
+            </div>
+            <button class="btn-full">Get Started →</button>
+            <div style="text-align:center;font-size:12px;color:var(--muted);">Already have an account? <span style="color:var(--pink);cursor:pointer;">Sign in</span></div>
+          </div>
+          <div class="wizard-caption">invite landing</div>
+        </div>
+
+        <!-- Step 1: Account -->
+        <div>
+          <div class="wizard-card">
+            <div class="step-dots">
+              <div class="step-dot active"></div>
+              <div class="step-dot"></div><div class="step-dot"></div>
+              <div class="step-dot"></div><div class="step-dot"></div>
+            </div>
+            <div>
+              <div class="wizard-title">Create your account</div>
+              <div class="wizard-sub">step 1 of 5</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div><label class="field-label">display name</label><input class="field" placeholder="Alex"></div>
+              <div><label class="field-label">email</label><input class="field" placeholder="you@example.com"></div>
+              <div><label class="field-label">password</label><input class="field" type="password" placeholder="8+ characters"></div>
+            </div>
+            <button class="btn-full">Create Account →</button>
+          </div>
+          <div class="wizard-caption">step 1 — account creation</div>
+        </div>
+
+        <!-- Step 2: Colour -->
+        <div>
+          <div class="wizard-card">
+            <div class="step-dots">
+              <div class="step-dot done"></div>
+              <div class="step-dot active"></div>
+              <div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div>
+            </div>
+            <div>
+              <div class="wizard-title">Choose your colour</div>
+              <div class="wizard-sub">how you appear on the map</div>
+            </div>
+            <div class="colour-row">
+              <div class="avatar" style="background:var(--purple);font-size:15px;">A</div>
+              <div class="colour-swatches">
+                <div class="swatch occupied" style="background:#E05C5C;"></div>
+                <div class="swatch occupied" style="background:#E08A5C;"></div>
+                <div class="swatch" style="background:#D4B84A;"></div>
+                <div class="swatch selected" style="background:#5CB85C;"></div>
+                <div class="swatch" style="background:#5C9ED4;"></div>
+                <div class="swatch" style="background:#8A6FD4;"></div>
+                <div class="swatch" style="background:#D45CA0;"></div>
+                <div class="swatch" style="background:#5CD4C0;"></div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--muted);font-family:var(--mono);">occupied colours greyed out</div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost" style="flex:1;text-align:center;">← back</button>
+              <button class="btn" style="flex:1;text-align:center;">next →</button>
+            </div>
+          </div>
+          <div class="wizard-caption">step 2 — colour picker</div>
+        </div>
+
+        <!-- Step 4: Configure -->
+        <div>
+          <div class="wizard-card">
+            <div class="step-dots">
+              <div class="step-dot done"></div><div class="step-dot done"></div>
+              <div class="step-dot done"></div>
+              <div class="step-dot active"></div><div class="step-dot"></div>
+            </div>
+            <div>
+              <div class="wizard-title">Connect the app</div>
+              <div class="wizard-sub">step 4 of 5</div>
+            </div>
+            <button class="btn-full">Open Traccar Client →</button>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="flex:1;height:1px;background:var(--border);"></div>
+              <span style="font-family:var(--mono);font-size:11px;color:var(--muted2);">or scan</span>
+              <div style="flex:1;height:1px;background:var(--border);"></div>
+            </div>
+            <div style="display:flex;justify-content:center;">
+              <div class="qr-mock">QR<br>code</div>
+            </div>
+            <div class="accordion">
+              <div class="accordion-head">▼ need help? enter manually</div>
+              <div class="accordion-body">
+                <div style="font-family:var(--mono);font-size:10px;color:var(--muted2);">server url</div>
+                <div class="copy-row">
+                  <input class="field" style="font-family:var(--mono);font-size:10px;padding:6px 8px;" value="tracking.elphiene.com/api" readonly>
+                  <button class="copy-btn">⎘</button>
+                </div>
+                <div style="font-family:var(--mono);font-size:10px;color:var(--muted2);">device id</div>
+                <div class="copy-row">
+                  <input class="field" style="font-family:var(--mono);font-size:10px;padding:6px 8px;" value="a3f9bc21-..." readonly>
+                  <button class="copy-btn">⎘</button>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost" style="flex:1;text-align:center;">← back</button>
+              <button class="btn" style="flex:1;text-align:center;font-size:11px;">i've connected →</button>
+            </div>
+          </div>
+          <div class="wizard-caption">step 4 — configure app</div>
+        </div>
+
+        <!-- Step 5: Waiting -->
+        <div>
+          <div class="wizard-card" style="align-items:center;text-align:center;">
+            <div class="step-dots">
+              <div class="step-dot done"></div><div class="step-dot done"></div>
+              <div class="step-dot done"></div><div class="step-dot done"></div>
+              <div class="step-dot active"></div>
+            </div>
+            <div class="pulse-wrap">
+              <div class="pulse-ring"></div>
+              <div class="pulse-ring"></div>
+              <div class="pulse-ring"></div>
+              <div class="pulse-av">A</div>
+            </div>
+            <div>
+              <div class="wizard-title">Waiting for your device…</div>
+              <div class="wizard-sub">make sure Traccar Client is open<br>and location is enabled</div>
+            </div>
+          </div>
+          <div class="wizard-caption">step 5 — waiting</div>
+        </div>
+
+        <!-- Step 5: Success -->
+        <div>
+          <div class="wizard-card" style="align-items:center;text-align:center;">
+            <div class="step-dots">
+              <div class="step-dot done"></div><div class="step-dot done"></div>
+              <div class="step-dot done"></div><div class="step-dot done"></div>
+              <div class="step-dot active"></div>
+            </div>
+            <div class="success-av-wrap">
+              <div class="success-ring"></div>
+              <div class="success-av">A</div>
+            </div>
+            <div>
+              <div class="wizard-title" style="color:var(--green);">✓ You're live!</div>
+              <div class="wizard-sub">your location is sharing<br>Alex and 2 others can see you</div>
+            </div>
+            <button class="btn-full">Go to Map →</button>
+          </div>
+          <div class="wizard-caption">step 5 — success</div>
+        </div>
+
+        <!-- Step 5: Help -->
+        <div>
+          <div class="wizard-card">
+            <div class="step-dots">
+              <div class="step-dot done"></div><div class="step-dot done"></div>
+              <div class="step-dot done"></div><div class="step-dot done"></div>
+              <div class="step-dot active"></div>
+            </div>
+            <div>
+              <div class="wizard-title">Still waiting…</div>
+              <div class="wizard-sub">most common fixes</div>
+            </div>
+            <div class="help-steps">
+              <div class="help-step"><div class="help-num">1</div><span>Open Traccar Client — is it showing "Sending"?</span></div>
+              <div class="help-step"><div class="help-num">2</div><span>Allow location permission (set to "Always")</span></div>
+              <div class="help-step"><div class="help-num">3</div><span>Check the server URL is correct</span></div>
+            </div>
+            <button class="btn btn-ghost" style="text-align:center;">← redo device setup</button>
+            <button class="btn btn-ghost" style="text-align:center;font-size:11px;">skip for now — i'll fix later</button>
+          </div>
+          <div class="wizard-caption">step 5 — help state (2min timeout)</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SETTINGS ═══════════ -->
+<div id="settings" class="screen">
+  <div class="settings-wrap">
+    <div class="settings-topbar">
+      <span class="settings-back">← back to map</span>
+      <span style="font-size:14px;font-weight:700;color:var(--text);">Settings</span>
+    </div>
+    <div class="settings-content">
+
+      <!-- Account -->
+      <div class="settings-section" id="s-account">
+        <div class="settings-head">Account</div>
+        <div class="settings-body">
+          <div class="field-wrap" style="margin:0;"><label class="field-label">display name</label><input class="field" value="El"></div>
+          <div class="field-wrap" style="margin:0;"><label class="field-label">email</label><input class="field" value="el@example.com"></div>
+          <div style="border-top:1px solid var(--border);padding-top:14px;display:flex;flex-direction:column;gap:10px;">
+            <div class="field-wrap" style="margin:0;"><label class="field-label">current password</label><input class="field" type="password" placeholder="required to change password"></div>
+            <div class="field-wrap" style="margin:0;"><label class="field-label">new password <span style="color:var(--muted2);">(leave blank to keep)</span></label><input class="field" type="password" placeholder="8+ characters"></div>
+            <div class="field-wrap" style="margin:0;"><label class="field-label">confirm new password</label><input class="field" type="password" placeholder=""></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn">Save Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appearance -->
+      <div class="settings-section" id="s-appearance">
+        <div class="settings-head">Appearance</div>
+        <div class="settings-body">
+          <div>
+            <div class="settings-lbl">Your colour</div>
+            <div class="settings-sub">how you appear on everyone's map</div>
+          </div>
+          <div class="colour-row" style="margin-top:4px;">
+            <div class="avatar" style="background:var(--pink);font-size:15px;">E</div>
+            <div class="colour-swatches">
+              <div class="swatch occupied" style="background:#E05C5C;"></div>
+              <div class="swatch occupied" style="background:#E08A5C;"></div>
+              <div class="swatch" style="background:#D4B84A;"></div>
+              <div class="swatch" style="background:#5CB85C;"></div>
+              <div class="swatch selected" style="background:#5C9ED4;"></div>
+              <div class="swatch" style="background:#8A6FD4;"></div>
+              <div class="swatch" style="background:#D45CA0;"></div>
+              <div class="swatch" style="background:#5CD4C0;"></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn">Save Colour</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device & Tracking -->
+      <div class="settings-section" id="s-device">
+        <div class="settings-head">Device &amp; Tracking</div>
+        <div class="settings-body">
+          <div class="settings-row">
+            <div><div class="settings-lbl">Status</div></div>
+            <span class="tag badge-online">● Online</span>
+          </div>
+          <div class="settings-row">
+            <div class="settings-lbl">Last seen</div>
+            <span style="font-family:var(--mono);font-size:12px;color:var(--muted);">just now</span>
+          </div>
+          <div class="settings-row">
+            <div class="settings-lbl">Battery</div>
+            <span style="font-family:var(--mono);font-size:12px;color:var(--muted);">🔋 84%</span>
+          </div>
+          <div class="settings-row">
+            <div class="settings-lbl">Tracking frequency</div>
+            <span style="font-family:var(--mono);font-size:12px;color:var(--muted2);">60s (fixed)</span>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:14px;">
+            <button class="btn btn-ghost">Reconnect Device</button>
+            <div style="font-size:11px;color:var(--muted2);font-family:var(--mono);margin-top:5px;">use if you switched phones or reinstalled Traccar Client</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="settings-section" id="s-notifications">
+        <div class="settings-head">Notifications</div>
+        <div class="settings-body">
+          <table class="notif-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Own</th>
+                <th>Anyone</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Geofence entered</td><td><div class="dot-on"></div></td><td><div class="dot-on"></div></td></tr>
+              <tr><td>Geofence exited</td><td><div class="dot-on"></div></td><td><div class="dot-on"></div></td></tr>
+              <tr><td>Speeding</td><td><div class="dot-on"></div></td><td><div class="dot-on"></div></td></tr>
+              <tr><td>Device offline</td><td><div class="dot-on"></div></td><td><div class="dot-off"></div></td></tr>
+              <tr><td>Low battery</td><td><div class="dot-on"></div></td><td><div class="dot-off"></div></td></tr>
+            </tbody>
+          </table>
+          <div class="ntfy-divider">
+            <div class="settings-lbl">ntfy <span style="color:var(--muted2);font-weight:400;font-size:12px;">(optional)</span></div>
+            <div style="font-size:12px;color:var(--muted);">Install ntfy app → <span style="color:var(--pink);cursor:pointer;">ntfy.sh ↗</span></div>
+            <div>
+              <div class="field-label" style="margin-bottom:5px;">your topic</div>
+              <div class="ntfy-row">
+                <input class="field" style="font-family:var(--mono);font-size:10px;padding:7px 10px;" value="whereis-a3f9bc21-..." readonly>
+                <button class="copy-btn">⎘</button>
+              </div>
+            </div>
+            <button class="btn btn-ghost" style="width:100%;text-align:center;font-size:12px;">Send Test Notification</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin -->
+      <div class="settings-section" id="s-admin">
+        <div class="settings-head">Admin <span style="font-size:11px;font-weight:400;color:var(--muted);font-family:var(--mono);margin-left:4px;">role-gated</span></div>
+        <div class="settings-body">
+          <div class="settings-lbl">Invite Member</div>
+          <div>
+            <div class="field-label" style="margin-bottom:6px;">expires after</div>
+            <div class="expiry-chips">
+              <button class="chip active">24 hours</button>
+              <button class="chip">7 days</button>
+            </div>
+          </div>
+          <button class="btn">Generate Invite Link</button>
+          <div class="invite-link-box">
+            <span class="invite-url">tracking.elphiene.com/invite?token=abc123xyz</span>
+            <button class="copy-btn">Copy ✓</button>
+          </div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted2);">expires 9 May 2026 · single use</div>
+
+          <div style="border-top:1px solid var(--border);padding-top:14px;">
+            <div class="settings-lbl" style="margin-bottom:10px;">Members (4)</div>
+            <div class="member-row">
+              <div class="avatar" style="width:32px;height:32px;font-size:13px;">E</div>
+              <div class="member-info">
+                <div class="member-name">El (you) <span style="font-size:13px;">👑</span></div>
+                <div class="member-meta">● online · just now</div>
+              </div>
+            </div>
+            <div class="member-row">
+              <div class="avatar" style="width:32px;height:32px;font-size:13px;background:linear-gradient(135deg,var(--purple),#6366f1);">M</div>
+              <div class="member-info">
+                <div class="member-name">Mia</div>
+                <div class="member-meta">● online · 4 min ago</div>
+              </div>
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">Remove</button>
+            </div>
+            <div class="member-row">
+              <div class="avatar" style="width:32px;height:32px;font-size:13px;background:linear-gradient(135deg,#22c55e,#16a34a);">J</div>
+              <div class="member-info">
+                <div class="member-name">Jake</div>
+                <div class="member-meta" style="color:var(--muted2);">⚠ offline · 2 hrs ago</div>
+              </div>
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">Remove</button>
+            </div>
+            <div class="member-row">
+              <div class="avatar" style="width:32px;height:32px;font-size:13px;background:#222;color:var(--muted2);">S</div>
+              <div class="member-info">
+                <div class="member-name" style="color:var(--muted);">Sam</div>
+                <div class="member-meta" style="color:var(--muted2);">⏸ paused · 1 hr ago</div>
+              </div>
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="settings-section danger-section" id="s-danger">
+        <div class="danger-head">Danger Zone</div>
+        <div class="settings-body">
+          <div>
+            <div class="settings-lbl" style="color:var(--text);">Leave Group</div>
+            <div class="settings-sub">permanently removes your account and deletes all your data</div>
+          </div>
+          <button class="btn-danger">Leave Group</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ GEOFENCE ═══════════ -->
+<div id="geofence" class="screen">
+  <div class="geofence-layout">
+
+    <div class="geofence-sidebar">
+      <div class="geofence-top">
+        <div class="section-label" style="margin:0;">zones</div>
+        <button class="btn" style="font-size:11px;padding:5px 10px;">+ New Zone</button>
+      </div>
+      <div class="zone-list">
+        <div class="zone-item active">
+          <div class="zone-name">Home</div>
+          <div class="zone-meta">250m · enter + exit</div>
+        </div>
+        <div class="zone-item">
+          <div class="zone-name">Work</div>
+          <div class="zone-meta">300m · enter only</div>
+        </div>
+        <div class="zone-item">
+          <div class="zone-name">School</div>
+          <div class="zone-meta">200m · enter + exit</div>
+        </div>
+      </div>
+
+      <!-- Config panel for selected zone -->
+      <div class="zone-config">
+        <div class="zone-config-title">Home</div>
+        <div>
+          <div class="field-label" style="margin-bottom:5px;">name</div>
+          <input class="field" value="Home" style="font-size:13px;">
+        </div>
+        <div>
+          <div class="field-label" style="margin-bottom:5px;">radius</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input class="field" value="250" style="font-size:13px;width:70px;">
+            <span style="font-family:var(--mono);font-size:12px;color:var(--muted2);">metres</span>
+          </div>
+        </div>
+        <div>
+          <div class="field-label" style="margin-bottom:5px;">alert on</div>
+          <div class="radio-group">
+            <button class="radio-chip active">enter + exit</button>
+            <button class="radio-chip">enter</button>
+            <button class="radio-chip">exit</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn" style="flex:1;text-align:center;">Save</button>
+          <button class="btn btn-ghost" style="padding:7px 10px;font-size:11px;">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="geofence-map">
+      <!-- roads -->
+      <div class="road h main" style="top:45%;left:0;right:0;position:absolute;"></div>
+      <div class="road v main" style="left:38%;top:0;bottom:0;position:absolute;"></div>
+      <div class="road h" style="top:25%;left:0;right:0;position:absolute;"></div>
+      <div class="road v" style="left:65%;top:0;bottom:0;position:absolute;"></div>
+
+      <!-- existing geofence: Work (not selected) -->
+      <div class="geofence" style="width:140px;height:140px;left:65%;top:28%;"></div>
+      <div class="geofence-tag" style="left:65%;top:20%;">work</div>
+
+      <!-- existing geofence: School -->
+      <div class="geofence" style="width:100px;height:100px;left:28%;top:62%;"></div>
+      <div class="geofence-tag" style="left:28%;top:56%;">school</div>
+
+      <!-- active geofence: Home (selected, being edited) -->
+      <div class="gf-drawing" style="width:180px;height:180px;left:55%;top:55%;"></div>
+      <div class="gf-centre" style="left:55%;top:55%;"></div>
+      <div class="gf-label" style="left:55%;top:44%;">home · 250m</div>
+
+      <!-- friend markers -->
+      <div class="marker" style="left:55%;top:57%;">
+        <div class="marker-pin" style="width:30px;height:30px;font-size:13px;">🧑</div>
+      </div>
+      <div class="marker" style="left:66%;top:30%;">
+        <div class="marker-pin purple" style="width:28px;height:28px;font-size:12px;">👩</div>
+      </div>
+
+      <!-- draw toolbar -->
+      <div class="draw-toolbar">
+        <div class="draw-tool" title="select">↖</div>
+        <div class="draw-tool active" title="draw circle">◎</div>
+        <div class="draw-tool" title="delete">🗑</div>
+      </div>
+
+      <!-- radius control -->
+      <div class="radius-control">
+        <label>radius</label>
+        <input class="radius-input" value="250">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--muted2);">m</span>
+        <button class="btn" style="font-size:11px;padding:5px 12px;">Place Zone</button>
+      </div>
+
+      <!-- FABs -->
+      <div class="map-fabs">
+        <div class="fab pink">⊕</div>
+        <div class="fab">+</div>
+        <div class="fab">−</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Login background map — Melbourne CBD
+  const loginMap = new maplibregl.Map({
+    container: 'login-map',
+    style: 'https://tiles.openfreemap.org/styles/liberty',
+    center: [144.9631, -37.8136],
+    zoom: 13,
+    interactive: false,
+    attributionControl: false
+  });
+
+  const mapStyles = {
+    liberty:  'https://tiles.openfreemap.org/styles/liberty',
+    positron: 'https://tiles.openfreemap.org/styles/positron',
+    bright:   'https://tiles.openfreemap.org/styles/bright',
+    dark:     'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+  };
+  function setMapStyle(key) {
+    loginMap.setStyle(mapStyles[key]);
+    document.querySelectorAll('.ms-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('ms-' + key).classList.add('active');
+  }
+
+  function show(id, btn) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.wf-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    // resize map when login tab is shown
+    if (id === 'login') loginMap.resize();
+  }
+</script>
+</body>
+</html>

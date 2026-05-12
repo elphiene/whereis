@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE properties SYSTEM 'http://java.sun.com/dtd/properties.dtd'>
+
+<properties>
+
+    <!-- Database -->
+    <entry key='database.driver'>org.h2.Driver</entry>
+    <entry key='database.url'>jdbc:h2:/opt/traccar/data/database</entry>
+
+    <!-- Web server -->
+    <entry key='web.enable'>true</entry>
+    <entry key='web.port'>8082</entry>
+
+    <!-- Geocoding via Traccar-hosted Nominatim (no API key required) -->
+    <entry key='geocoder.enable'>true</entry>
+    <entry key='geocoder.type'>nominatim</entry>
+    <entry key='geocoder.url'>https://geocoder.traccar.org/api/</entry>
+
+    <!-- Webhook forwarding to Bun backend for ntfy notifications -->
+    <entry key='event.forward.enable'>true</entry>
+    <entry key='event.forward.url'>http://backend:3000/webhook</entry>
+
+</properties>

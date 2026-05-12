@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 125 568 310" width="512" height="512">
+  <!-- Background -->
+  <rect x="0" y="0" width="568" height="560" fill="#080808"/>
+  <!-- WhereIs? bracket/frame path (the W-shaped icon) -->
+  <path fill="#ec4899" d="M523.49,134.95H40.9c-22.59,0-40.9,18.31-40.9,40.9h0v101.05c24.79,0,44.89-20.1,44.89-44.89v-56.16h478.6v115.88h-88.03c-22.59,0-40.9,18.31-40.9,40.9v44.89h44.89v-44.89h88.03c22.59,0,40.9-18.31,40.9-40.9v-111.89c0-24.79-20.1-44.89-44.89-44.89Z"/>
+  <!-- Dot (question mark element) -->
+  <rect fill="#ffffff" x="394.56" y="382.46" width="44.89" height="44.89"/>
+</svg>

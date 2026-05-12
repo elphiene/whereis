@@ -1,0 +1,67 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    env_file:
+      - cloudflared.env
+    networks:
+      - internal
+    depends_on:
+      - nginx
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - internal
+    depends_on:
+      - frontend
+      - backend
+      - traccar
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - backend/.env
+    volumes:
+      - data:/data
+    networks:
+      - internal
+    depends_on:
+      - traccar
+
+  traccar:
+    image: traccar/traccar:latest
+    restart: unless-stopped
+    volumes:
+      - ./traccar/traccar.xml:/opt/traccar/conf/traccar.xml:ro
+      - traccar-data:/opt/traccar/data
+    networks:
+      - internal
+
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data
+  traccar-data:
+
+networks:
+  internal:
+    driver: bridge

@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Orbitron:wght@800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Always-dark theme — CSS variables for shadcn/ui components */
+  :root {
+    --background:             0 0% 3%;       /* #080808 */
+    --foreground:             0 0% 94%;      /* #f0f0f0 */
+    --card:                   0 0% 6%;       /* #101010 */
+    --card-foreground:        0 0% 94%;
+    --popover:                0 0% 6%;
+    --popover-foreground:     0 0% 94%;
+    --primary:                328 81% 60%;   /* #ec4899 */
+    --primary-foreground:     0 0% 100%;
+    --secondary:              271 54% 57%;   /* #9354d3 */
+    --secondary-foreground:   0 0% 100%;
+    --muted:                  0 0% 10%;
+    --muted-foreground:       0 0% 63%;      /* #a0a0a0 */
+    --accent:                 328 81% 60%;
+    --accent-foreground:      0 0% 100%;
+    --destructive:            0 62% 54%;     /* #ef4444-ish */
+    --destructive-foreground: 0 0% 98%;
+    --border:                 0 0% 100% / 0.07;
+    --input:                  0 0% 100% / 0.12;
+    --ring:                   328 81% 60%;
+    --radius:                 0.625rem;      /* 10px */
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply dark;
+  }
+
+  body {
+    background-color: #080808;
+    color: hsl(var(--foreground));
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Thin scrollbars throughout */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+}
