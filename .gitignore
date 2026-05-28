@@ -4,3 +4,8 @@ data/
 dist/
 .DS_Store
 *.local
+
+# Claude session artifacts
+CLAUDE.md
+.claude/
+PLAN.md
