@@ -1,0 +1,17 @@
+# docker-compose.override.yml — eldev.cherrysofa.com deployment profile
+#
+# Replaces the project-bundled cloudflared container with a host-port mapping.
+# The host's existing cloudflared.service routes eldev.cherrysofa.com → :8083.
+#
+# To use this override, just `docker compose up -d` from this directory —
+# docker compose loads docker-compose.override.yml automatically.
+
+services:
+  # Disable the bundled cloudflared tunnel — we're using the host's tunnel instead.
+  cloudflared:
+    profiles: ["disabled"]
+
+  # Expose nginx on host port 8083 so the host's cloudflared can reach it.
+  nginx:
+    ports:
+      - "127.0.0.1:8083:80"
