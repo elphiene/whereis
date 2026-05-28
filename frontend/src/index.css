@@ -33,9 +33,8 @@
     @apply border-border;
   }
 
-  html {
-    @apply dark;
-  }
+  /* Force dark theme — the `dark` class is set on <html> directly in index.html
+     (Tailwind's `dark:` modifier can't be @apply'd in v3 darkMode=class). */
 
   body {
     background-color: #080808;

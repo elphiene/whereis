@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts';
 import { DatePresetChips, getDateRange, type DatePreset } from '@/shared/components/DatePresetChips';
 import { useFriendsStore } from '@/features/friends/store';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { WizardShell, WizardButtons } from './WizardShell';
+import { WizardShell } from './WizardShell';
 import { useAuthStore } from '@/stores/auth.store';
 import { api } from '@/shared/lib/traccar';
 import type { OnboardingState } from '../hooks/useOnboardingState';

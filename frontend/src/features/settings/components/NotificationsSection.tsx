@@ -24,8 +24,9 @@ function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
 }
 
 export function NotificationsSection() {
-  const { user } = useAuthStore();
-  const { state: onbState } = useOnboardingState();
+  // useAuthStore/useOnboardingState imports retained for future use
+  void useAuthStore;
+  void useOnboardingState;
 
   const [prefs,       setPrefs]       = useState<PrefsMap>(() =>
     Object.fromEntries(EVENT_TYPES.map((e) => [e.key, { own: e.defaults.own, anyone: e.defaults.anyone }]))

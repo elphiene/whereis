@@ -52,7 +52,7 @@ interface InstallStepProps {
   skipLabel?: string;
 }
 
-export function InstallStep({ state, onUpdate, onNext, onBack, skipLabel }: InstallStepProps) {
+export function InstallStep({ state: _state, onUpdate, onNext, onBack, skipLabel }: InstallStepProps) {
   const [platform, setPlatform] = useState<Platform>(() => detectPlatform());
   const [showAll, setShowAll] = useState(platform === 'desktop');
 

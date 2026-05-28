@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useFriendsStore, sortMembers } from '../store';
 import { FriendCard } from './FriendCard';
 import { getMemberStatus } from '../store';
@@ -16,7 +16,6 @@ interface SidebarProps {
 }
 
 export function Sidebar({ onPauseToggle, className }: SidebarProps) {
-  const navigate = useNavigate();
   const members = useFriendsStore((s) => sortMembers(s.members));
   const online = onlineCount(members);
 

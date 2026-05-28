@@ -16,7 +16,7 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
 }
 
-function markerInnerHTML(member: Member, latitude: number, longitude: number, speed: number, course: number): string {
+function markerInnerHTML(member: Member, _latitude: number, _longitude: number, speed: number, course: number): string {
   const initials = member.name.slice(0, 2).toUpperCase();
   const colour = member.colour;
   const soft = hexToRgba(colour, 0.15);
